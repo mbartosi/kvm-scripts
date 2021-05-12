@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source_vm=debian11
-vm_names=( kube01 kube02 )
+vm_names=( kube-master kube01 kube02 )
 
 for vm in "${vm_names[@]}"
 do
