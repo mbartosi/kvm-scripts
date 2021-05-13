@@ -39,6 +39,9 @@ do
     wait_ssh $vm
 done
 
+# Create master
+ssh -o CheckHostIP=no -o ConnectTimeout=10 -o StrictHostKeyChecking=no root@km < create-kubeadm-cluster.sh
+
 token=$(ssh -q -o BatchMode=yes -o CheckHostIP=no -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o LogLevel=error root@km < get-token.sh | tail -n 1)
 hash=$(ssh -q -o BatchMode=yes -o CheckHostIP=no -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o LogLevel=error root@km < get-hash.sh | tail -n 1)
 master_ip=$(ssh -q -o BatchMode=yes -o CheckHostIP=no -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o LogLevel=error root@km < get-ip.sh | tail -n 1)
@@ -47,6 +50,7 @@ echo IP: $master_ip
 echo Token: $token
 echo Hash: $hash
 
+# Join worker
 cat << EOF > join-kubeadm-cluster.sh
 #/bin/bash
 kubeadm join $master_ip:6443 --token $token --discovery-token-ca-cert-hash sha256:$hash
