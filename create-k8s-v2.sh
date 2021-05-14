@@ -12,11 +12,6 @@ function wait_ssh () {
     echo Trying SSH connection to host: $1...
     # wait for host up:
     until nc -vzw 2 $1 22 > /dev/null 2>&1; do sleep 2; done
-    # try ssh connection:
-#    ssh -o BatchMode=yes -o CheckHostIP=no -o ConnectionAttempts=30 -o ConnectTimeout=2 -o StrictHostKeyChecking=no "$1"@"$2" exit
-#    if [ $? != "0" ]; then
-#        echo Connection to $2 failed
-#    fi
     echo SSH server $1 up.
 }
 
