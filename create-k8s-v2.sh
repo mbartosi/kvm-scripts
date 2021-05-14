@@ -34,22 +34,28 @@ do
     wait_ssh $vm
 done
 
-# Create master
-ssh -o CheckHostIP=no -o ConnectTimeout=10 -o StrictHostKeyChecking=no root@km < create-kubeadm-cluster.sh
+# Create master (vm_names[0] is the master VM):
+ssh -o CheckHostIP=no -o ConnectTimeout=10 -o StrictHostKeyChecking=no root@${vm_names[0]} < create-kubeadm-cluster.sh
 
 token=$(ssh -q -o BatchMode=yes -o CheckHostIP=no -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o LogLevel=error root@km < get-token.sh | tail -n 1)
 hash=$(ssh -q -o BatchMode=yes -o CheckHostIP=no -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o LogLevel=error root@km < get-hash.sh | tail -n 1)
 master_ip=$(ssh -q -o BatchMode=yes -o CheckHostIP=no -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o LogLevel=error root@km < get-ip.sh | tail -n 1)
 
+echo Detected Kubernetes info from master node (${vm_names[0]}):
 echo IP: $master_ip
 echo Token: $token
 echo Hash: $hash
 
-# Join worker
+# Join workers:
 cat << EOF > join-kubeadm-cluster.sh
 #/bin/bash
 kubeadm join $master_ip:6443 --token $token --discovery-token-ca-cert-hash sha256:$hash
 EOF
 
 chmod +x join-kubeadm-cluster.sh
-ssh -o CheckHostIP=no -o ConnectTimeout=10 -o StrictHostKeyChecking=no root@k1 < join-kubeadm-cluster.sh
+
+for vm in "${vm_names[@]:1}"
+do
+    echo Joining
+    ssh -o CheckHostIP=no -o ConnectTimeout=10 -o StrictHostKeyChecking=no root@$vm < join-kubeadm-cluster.sh
+done
