@@ -41,8 +41,9 @@ then
         do
         echo Resising VM $vm disk to $vm_size GB...
         lvrename /dev/vg0raid/$vm /dev/vg0raid/$vm.old
-        lvcreate --size $vm_size /dev/vg0raid/$vm
+        lvcreate --size "$vm_size"G  --name $vm /dev/vg0raid
         virt-resize --expand /dev/sda2 /dev/vg0raid/$vm.old /dev/vg0raid/$vm
+        lvremove -f /dev/vg0raid/$vm.old
     done
 fi
 
