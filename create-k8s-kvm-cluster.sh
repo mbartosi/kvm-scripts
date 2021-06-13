@@ -5,7 +5,7 @@
 source_vm=debian11
 
 # New VM names, first one is the master node:
-vm_names=( kube-master kube1 )
+vm_names=( kube-master kube1 kube2 kube3 )
 # New disk size for all nodes:
 vm_size=30
 # New memory size for all nodes:
